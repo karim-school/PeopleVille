@@ -1,9 +1,25 @@
-﻿namespace PeopleVille;
+﻿using SimulationEngine;
 
-class Program
+namespace PeopleVille;
+
+internal static class Program
 {
-    static void Main(string[] args)
+    private static void Main(string[] args)
     {
-        Console.WriteLine("Hello, World!");
+        var world = new World();
+        
+        const int initialPopulation = 5;
+        var people = PersonFactory.CreatePeople(world, initialPopulation);
+        
+        world.EnqueueEvent(() =>
+        {
+            foreach (var person in people)
+            {
+                Console.WriteLine($"Skin color: {person.Appearance.SkinColorFormatted}");
+                Console.WriteLine($"Hair color: {person.Appearance.HairColorFormatted}");
+            }
+        });
+
+        world.Run();
     }
 }

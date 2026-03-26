@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PeopleVille", "PeopleVille\PeopleVille.csproj", "{6C9819B0-A203-4120-ACA3-7634F35C119A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimulationEngine", "SimulationEngine\SimulationEngine.csproj", "{CF526D29-1A87-4122-9435-75E80FB2CA54}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{6C9819B0-A203-4120-ACA3-7634F35C119A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C9819B0-A203-4120-ACA3-7634F35C119A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C9819B0-A203-4120-ACA3-7634F35C119A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF526D29-1A87-4122-9435-75E80FB2CA54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF526D29-1A87-4122-9435-75E80FB2CA54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF526D29-1A87-4122-9435-75E80FB2CA54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF526D29-1A87-4122-9435-75E80FB2CA54}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,11 +1,30 @@
 {
   "version": 3,
   "targets": {
-    "net10.0": {}
+    "net10.0": {
+      "SimulationEngine/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "compile": {
+          "bin/placeholder/SimulationEngine.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/SimulationEngine.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "SimulationEngine/1.0.0": {
+      "type": "project",
+      "path": "../SimulationEngine/SimulationEngine.csproj",
+      "msbuildProject": "../SimulationEngine/SimulationEngine.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net10.0": []
+    "net10.0": [
+      "SimulationEngine >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\Karim\\.nuget\\packages\\": {},
@@ -38,7 +57,11 @@
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "D:\\Development\\Projects\\School\\HF2\\PeopleVille\\SimulationEngine\\SimulationEngine.csproj": {
+              "projectPath": "D:\\Development\\Projects\\School\\HF2\\PeopleVille\\SimulationEngine\\SimulationEngine.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
