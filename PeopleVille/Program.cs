@@ -43,8 +43,9 @@ internal static class Program
 
             if (Random.Shared.Next(20) > 0) // 95%
             {
-                var allTickEvents = Enum.GetValues<VanillaTickEvents>();
-                var tickEvent = allTickEvents[Random.Shared.Next(allTickEvents.Length)];
+                // var allTickEvents = Enum.GetValues<VanillaTickEvents>();
+                // var tickEvent = allTickEvents[Random.Shared.Next(allTickEvents.Length)];
+                var tickEvent = VanillaTickEvents.BUY_ITEM;
 
                 // TODO: Use state pattern
                 var people = WorldManager.World.Inhabitants.ToArray();
@@ -52,22 +53,51 @@ internal static class Program
                 {
                     var buyerIndex = Random.Shared.Next(people.Length);
                     var buyer = (people[buyerIndex] as Person)!;
-                    int sellerIndex;
-                    do
+                    var allItems = Enum.GetValues<ItemEnum>();
+                    var itemToBuy = allItems[Random.Shared.Next(allItems.Length)];
+                    var quantityToBuy = Random.Shared.Next(5) + 1;
+                    var peopleWithItem = people.Where(x =>
+                        x is Person p &&
+                        p.Items.Any(y =>
+                            y.ItemType == itemToBuy &&
+                            y.Quantity >= quantityToBuy &&
+                            y.SellPrice != null && y.SellPrice <= buyer.Cash))
+                        .ToArray();
+                    if (peopleWithItem.Length == 0 || (peopleWithItem.Length == 1 && peopleWithItem[0] == buyer))
                     {
-                        sellerIndex = Random.Shared.Next(people.Length);
-                    } while (sellerIndex != buyerIndex);
-                    var seller = (people[sellerIndex] as Person)!;
-                    switch (tickEvent)
+                        Console.WriteLine(
+                            $"Buyer {buyer.Name} could not find any seller with {quantityToBuy}x {itemToBuy} within their budget");
+                    }
+                    else
                     {
-                        case VanillaTickEvents.BUY_ITEM:
-                            Console.WriteLine("Buy item");
-                            TransactionalEvents.OnCashForItemTransaction(buyer, seller, ItemEnum.ITEM_A, 2, 5.4M);
-                            break;
-                        case VanillaTickEvents.SELL_ITEM:
-                            Console.WriteLine("Sell item");
-                            TransactionalEvents.OnCashForItemTransaction(buyer, seller, ItemEnum.ITEM_A, 3, 4.8M);
-                            break;
+                        Person seller;
+                        decimal totalPrice;
+                        do
+                        {
+                            seller = (peopleWithItem[Random.Shared.Next(peopleWithItem.Length)] as Person)!;
+                            totalPrice = seller.Items
+                                .First(x => x.ItemType == itemToBuy)
+                                .SellPrice!.Value * quantityToBuy;
+                        } while (seller == buyer);
+                        switch (tickEvent)
+                        {
+                            case VanillaTickEvents.BUY_ITEM:
+                                if (Person.MakeTransaction(buyer, seller, itemToBuy, quantityToBuy, totalPrice))
+                                {
+                                    TransactionalEvents.OnCashForItemTransaction(buyer, seller, itemToBuy, quantityToBuy, totalPrice / quantityToBuy);
+                                    Console.WriteLine(
+                                        $"{buyer.Name} ({buyer.ID.ToString()[..6]}) bought {quantityToBuy}x {itemToBuy} from {seller.Name} ({seller.ID.ToString()[..6]}) for {totalPrice:0.00}");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Transaction failed");
+                                }
+                                break;
+                            // case VanillaTickEvents.SELL_ITEM:
+                            //     Console.WriteLine("Sell item");
+                            //     TransactionalEvents.OnCashForItemTransaction(buyer, seller, ItemEnum.ITEM_A, 3, 4.8M);
+                            //     break;
+                        }
                     }
                 }
             }
