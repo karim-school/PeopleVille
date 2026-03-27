@@ -5,6 +5,8 @@ namespace PeopleVille;
 
 internal static class Program
 {
+    private static int Ticks = 0;
+    
     private static void Main(string[] args)
     {
         var extensions = LoadExtensions();
@@ -19,13 +21,31 @@ internal static class Program
         
         WorldManager.World.EnqueueEvent(() =>
         {
-            WorldManager.World.Stop();
+            foreach (var inhabitant in WorldManager.World.Inhabitants.Where(x =>
+                         x.GetType().IsAssignableFrom(typeof(Person))))
+            {
+                Console.WriteLine(inhabitant.ID);
+                foreach (var items in (inhabitant as Person)!.Items)
+                {
+                    Console.WriteLine("  " + items);
+                }
+            }
         });
         
         foreach (var extension in extensions)
         {
             extension.OnLoad();
         }
+
+        WorldManager.World.WorldTick += () =>
+        {
+            Console.WriteLine("Tick");
+            
+            if (++Ticks == 3)
+            {
+                WorldManager.World.Stop();
+            }
+        };
         
         PersonFactory.CreatePeople(WorldManager.World, options.InitialPopulation);
         WorldManager.World.Run();

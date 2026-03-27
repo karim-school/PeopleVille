@@ -2,19 +2,34 @@
 
 public class World : IWorld
 {
+    public delegate void WorldTickHandler();
+    
+    public event WorldTickHandler? WorldTick;
+    
     protected readonly EventDispatcher EventDispatcher = new();
-    protected readonly HashSet<IWorldInhabitant> Inhabitants = [];
+    protected readonly HashSet<IWorldInhabitant> MutableInhabitants = [];
     
     protected bool Running;
+    protected long nextTick;
+
+    public IEnumerable<IWorldInhabitant> Inhabitants => MutableInhabitants.AsEnumerable();
     
     public void Run()
     {
         Running = true;
+        nextTick = DateTimeOffset.Now.ToUnixTimeMilliseconds();
         while (Running)
         {
             while (EventDispatcher.DispatchNext())
             {
                 Thread.Sleep(200);
+            }
+            
+            var now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            if (now >= nextTick)
+            {
+                OnWorldTick();
+                nextTick = now + Random.Shared.NextInt64(50, 10000);
             }
         }
     }
@@ -31,16 +46,21 @@ public class World : IWorld
 
     public IWorldInhabitant? GetInhabitant(Guid id)
     {
-        return Inhabitants.FirstOrDefault(x => x.ID == id);
+        return MutableInhabitants.FirstOrDefault(x => x.ID == id);
     }
 
     public bool AddInhabitant(IWorldInhabitant inhabitant)
     {
-        return Inhabitants.Add(inhabitant);
+        return MutableInhabitants.Add(inhabitant);
     }
     
     public bool RemoveInhabitant(IWorldInhabitant inhabitant)
     {
-        return Inhabitants.Remove(inhabitant);
+        return MutableInhabitants.Remove(inhabitant);
+    }
+
+    protected virtual void OnWorldTick()
+    {
+        WorldTick?.Invoke();
     }
 }

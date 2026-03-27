@@ -2,6 +2,8 @@
 
 public interface IWorld
 {
+    IEnumerable<IWorldInhabitant> Inhabitants { get; }
+    
     IWorldInhabitant? GetInhabitant(Guid id);
     
     bool AddInhabitant(IWorldInhabitant inhabitant);
