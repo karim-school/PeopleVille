@@ -2,42 +2,45 @@
 
 public class World : IWorld
 {
-    private readonly EventDispatcher _eventDispatcher = new();
-    private readonly HashSet<IWorldInhabitant> _inhabitants = [];
+    protected readonly EventDispatcher EventDispatcher = new();
+    protected readonly HashSet<IWorldInhabitant> Inhabitants = [];
     
-    private bool _running;
+    protected bool Running;
     
     public void Run()
     {
-        _running = true;
-        while (_running)
+        Running = true;
+        while (Running)
         {
-            while (_eventDispatcher.DispatchNext())
+            while (EventDispatcher.DispatchNext())
             {
                 Thread.Sleep(200);
             }
-
-            _running = false;
         }
+    }
+
+    public void Stop()
+    {
+        Running = false;
     }
 
     public void EnqueueEvent(Action @event)
     {
-        _eventDispatcher.Enqueue(@event);
+        EventDispatcher.Enqueue(@event);
     }
 
     public IWorldInhabitant? GetInhabitant(Guid id)
     {
-        return _inhabitants.FirstOrDefault(x => x.ID == id);
+        return Inhabitants.FirstOrDefault(x => x.ID == id);
     }
 
     public bool AddInhabitant(IWorldInhabitant inhabitant)
     {
-        return _inhabitants.Add(inhabitant);
+        return Inhabitants.Add(inhabitant);
     }
     
     public bool RemoveInhabitant(IWorldInhabitant inhabitant)
     {
-        return _inhabitants.Remove(inhabitant);
+        return Inhabitants.Remove(inhabitant);
     }
 }
