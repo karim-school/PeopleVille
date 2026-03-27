@@ -40,6 +40,37 @@ internal static class Program
         WorldManager.World.WorldTick += () =>
         {
             Console.WriteLine("Tick");
+
+            if (Random.Shared.Next(20) > 0) // 95%
+            {
+                var allTickEvents = Enum.GetValues<VanillaTickEvents>();
+                var tickEvent = allTickEvents[Random.Shared.Next(allTickEvents.Length)];
+
+                // TODO: Use state pattern
+                var people = WorldManager.World.Inhabitants.ToArray();
+                if (people.Length > 1)
+                {
+                    var buyerIndex = Random.Shared.Next(people.Length);
+                    var buyer = (people[buyerIndex] as Person)!;
+                    int sellerIndex;
+                    do
+                    {
+                        sellerIndex = Random.Shared.Next(people.Length);
+                    } while (sellerIndex != buyerIndex);
+                    var seller = (people[sellerIndex] as Person)!;
+                    switch (tickEvent)
+                    {
+                        case VanillaTickEvents.BUY_ITEM:
+                            Console.WriteLine("Buy item");
+                            TransactionalEvents.OnCashForItemTransaction(buyer, seller, ItemEnum.ITEM_A, 2, 5.4M);
+                            break;
+                        case VanillaTickEvents.SELL_ITEM:
+                            Console.WriteLine("Sell item");
+                            TransactionalEvents.OnCashForItemTransaction(buyer, seller, ItemEnum.ITEM_A, 3, 4.8M);
+                            break;
+                    }
+                }
+            }
             
             if (++Ticks == 3)
             {

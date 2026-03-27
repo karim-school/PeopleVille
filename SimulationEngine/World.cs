@@ -17,7 +17,7 @@ public class World : IWorld
     public void Run()
     {
         Running = true;
-        nextTick = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+        nextTick = DateTimeOffset.Now.ToUnixTimeMilliseconds() + Random.Shared.NextInt64(50, 10000);
         while (Running)
         {
             while (EventDispatcher.DispatchNext())
