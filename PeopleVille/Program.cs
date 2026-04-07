@@ -21,14 +21,13 @@ internal static class Program
         
         WorldManager.World.EnqueueEvent(() =>
         {
-            foreach (var inhabitant in WorldManager.World.Inhabitants.Where(x =>
-                         x.GetType().IsAssignableFrom(typeof(Person))))
+            foreach (var person in WorldManager.People)
             {
-                Console.WriteLine(inhabitant.ID);
-                foreach (var items in (inhabitant as Person)!.Items)
-                {
-                    Console.WriteLine("  " + items);
-                }
+                Console.WriteLine($"Found person with ID {person.ID}; Balance: {person.Cash:0.00}, Items: {string.Join(", ", person.Items)}, Hair color: #{person.Appearance.HairColorFormatted}, Skin color: #{person.Appearance.SkinColorFormatted}");
+                // foreach (var items in inhabitant.Items)
+                // {
+                //     Console.WriteLine("  " + items);
+                // }
             }
         });
         
@@ -36,10 +35,39 @@ internal static class Program
         {
             extension.OnLoad();
         }
-
+        
+        try
+        {
+            ItemRegistry.Load("items.json");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        
         WorldManager.World.WorldTick += () =>
         {
             Console.WriteLine("Tick");
+
+            if (Random.Shared.NextDouble() <= 0.5)
+            {
+                Console.WriteLine("Random event occurred");
+                
+                try
+                {
+                    var randomItem = ItemRegistry.GetRandom();
+                    var people = WorldManager.People.ToArray();
+                    var randomPerson = people[Random.Shared.Next(people.Length)];
+                    
+                    randomPerson.AddItem(randomItem);
+                    
+                    Console.WriteLine($"Added {randomItem.Name} to person with ID {randomPerson.ID}");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
             
             if (++Ticks == 3)
             {

@@ -10,14 +10,14 @@ public class World : IWorld
     protected readonly HashSet<IWorldInhabitant> MutableInhabitants = [];
     
     protected bool Running;
-    protected long nextTick;
+    protected long NextTick;
 
     public IEnumerable<IWorldInhabitant> Inhabitants => MutableInhabitants.AsEnumerable();
     
     public void Run()
     {
         Running = true;
-        nextTick = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+        NextTick = DateTimeOffset.Now.ToUnixTimeMilliseconds();
         while (Running)
         {
             while (EventDispatcher.DispatchNext())
@@ -26,10 +26,10 @@ public class World : IWorld
             }
             
             var now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            if (now >= nextTick)
+            if (now >= NextTick)
             {
                 OnWorldTick();
-                nextTick = now + Random.Shared.NextInt64(50, 10000);
+                NextTick = now + Random.Shared.NextInt64(50, 750);
             }
         }
     }

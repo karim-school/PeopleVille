@@ -13,6 +13,11 @@ public static class WorldManager
 
     public static World? World { get; internal set; }
 
+    public static IEnumerable<Person> People => World?.Inhabitants
+        .Where(x =>
+            x.GetType().IsAssignableFrom(typeof(Person)))
+        .Cast<Person>() ?? [];
+
     internal static World? OnWorldCreation(WorldCreationOptions options)
     {
         return WorldCreation?.Invoke(options);
