@@ -31,11 +31,6 @@ internal static class Program
             }
         });
         
-        foreach (var extension in extensions)
-        {
-            extension.OnLoad();
-        }
-        
         try
         {
             ItemRegistry.Load("items.json");
@@ -43,6 +38,11 @@ internal static class Program
         catch (Exception e)
         {
             Console.WriteLine(e);
+        }
+        
+        foreach (var extension in extensions)
+        {
+            extension.OnLoad();
         }
         
         WorldManager.World.WorldTick += () =>

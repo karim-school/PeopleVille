@@ -4,7 +4,7 @@ namespace PeopleVille;
 
 public static class ItemRegistry
 {
-    private static List<Item> ItemsRegistry { get; } = [];
+    private static readonly List<Item> ItemsRegistry = [];
 
     public static IReadOnlyList<Item> Items { get; } = ItemsRegistry.AsReadOnly();
 

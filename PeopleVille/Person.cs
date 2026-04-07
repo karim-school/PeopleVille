@@ -3,11 +3,11 @@ using SimulationEngine;
 
 namespace PeopleVille;
 
-public class Person(IWorld world) : IWorldInhabitant
+public class Person(IWorld world, Guid? id = null) : IWorldInhabitant
 {
     public IWorld World { get; } = world;
     
-    public Guid ID { get; } = Guid.NewGuid();
+    public Guid ID { get; } = id ?? Guid.NewGuid();
 
     public HumanAppearance Appearance { get; } = new();
     
