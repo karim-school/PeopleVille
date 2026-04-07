@@ -49,6 +49,8 @@ internal static class Program
         {
             Console.WriteLine("Tick");
 
+            var people = WorldManager.People.ToArray();
+            
             if (Random.Shared.NextDouble() <= 0.5)
             {
                 Console.WriteLine("Random event occurred");
@@ -56,7 +58,6 @@ internal static class Program
                 try
                 {
                     var randomItem = ItemRegistry.GetRandom();
-                    var people = WorldManager.People.ToArray();
                     var randomPerson = people[Random.Shared.Next(people.Length)];
                     
                     randomPerson.AddItem(randomItem);
@@ -67,6 +68,14 @@ internal static class Program
                 {
                     Console.WriteLine(e);
                 }
+            }
+
+            if (Random.Shared.NextDouble() < 0.5)
+            {
+                var randomPerson = people[Random.Shared.Next(people.Length)];
+                var intent = new SeekingBuyItemIntent(randomPerson, ItemRegistry.GetRandom());
+                randomPerson._intents.Add(intent);
+                Console.WriteLine(intent.Declaration());
             }
             
             if (++Ticks == 3)

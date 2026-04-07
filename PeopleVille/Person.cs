@@ -12,6 +12,10 @@ public class Person(IWorld world, Guid? id = null) : IWorldInhabitant
     public HumanAppearance Appearance { get; } = new();
     
     public decimal Cash { get; set; } = 0M;
+
+    internal readonly List<IIntent> _intents = [];
+
+    public IReadOnlyList<IIntent> Intents => _intents.AsReadOnly();
     
     private readonly Dictionary<Item, uint> _items = new();
     
