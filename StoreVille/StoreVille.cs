@@ -23,7 +23,8 @@ public sealed class StoreVille : IVilleExtension
             
             foreach (var item in ItemRegistry.Items)
             {
-                store.AddItem(item, (uint)Random.Shared.Next(10, 51));
+                store.Inventory.AddItem(item, new decimal(Random.Shared.NextDouble() * 90 + 10));
+                store.Inventory[item].Quantity = (uint)Random.Shared.Next(10, 51);
             }
         }
         catch (Exception e)
@@ -46,13 +47,13 @@ public sealed class StoreVille : IVilleExtension
 
             try
             {
-                randomPerson.MakeTransaction(randomStore, randomItem, randomQuantity);
+                var transaction = randomPerson.BuyItem(randomStore, randomItem, randomQuantity);
 
-                Console.WriteLine($"{randomPerson.ID} bought {randomQuantity}x {randomItem.Name} from {randomStore.Name}");
+                Console.WriteLine($"{transaction.Person.ID} bought {transaction.Quantity}x {transaction.Item.Name} from {transaction.Store.Name} for {transaction.TotalPrice:0.00}");
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.InnerException?.Message);
+                Console.WriteLine(e.InnerException?.Message ?? e.Message);
             }
         };
     }
