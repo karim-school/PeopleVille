@@ -20,3 +20,24 @@ public sealed class EventDispatcher
         return true;
     }
 }
+
+public sealed class EventDispatcher<T>(T instance)
+{
+    private readonly Queue<Action<T>> _actions = new();
+
+    public void Enqueue(Action<T> action)
+    {
+        _actions.Enqueue(action);
+    }
+
+    public bool DispatchNext()
+    {
+        if (!_actions.TryDequeue(out var action))
+        {
+            return false;
+        }
+        
+        action.Invoke(instance);
+        return true;
+    }
+}

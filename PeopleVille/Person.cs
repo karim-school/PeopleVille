@@ -13,9 +13,9 @@ public class Person(IWorld world, Guid? id = null) : IWorldInhabitant
     
     public decimal Cash { get; set; } = 0M;
 
-    internal readonly List<IIntent> _intents = [];
+    internal readonly List<IIntent> MutableIntents = [];
 
-    public IReadOnlyList<IIntent> Intents => _intents.AsReadOnly();
+    public IReadOnlyList<IIntent> Intents => MutableIntents.AsReadOnly();
     
     private readonly Dictionary<Item, uint> _items = new();
     

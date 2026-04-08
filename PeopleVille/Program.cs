@@ -5,32 +5,10 @@ namespace PeopleVille;
 
 internal static class Program
 {
-    private static int Ticks = 0;
+    private static int _ticks = 0;
     
     private static void Main(string[] args)
     {
-        var extensions = LoadExtensions();
-
-        foreach (var extension in extensions)
-        {
-            extension.OnPreLoad();
-        }
-        
-        WorldCreationOptions options = new();
-        WorldManager.World = WorldManager.OnWorldCreation(options) ?? new World();
-        
-        WorldManager.World.EnqueueEvent(() =>
-        {
-            foreach (var person in WorldManager.People)
-            {
-                Console.WriteLine($"Found person with ID {person.ID}; Balance: {person.Cash:0.00}, Items: {string.Join(", ", person.Items)}, Hair color: #{person.Appearance.HairColorFormatted}, Skin color: #{person.Appearance.SkinColorFormatted}");
-                // foreach (var items in inhabitant.Items)
-                // {
-                //     Console.WriteLine("  " + items);
-                // }
-            }
-        });
-        
         try
         {
             ItemRegistry.Load("items.json");
@@ -40,54 +18,76 @@ internal static class Program
             Console.WriteLine(e);
         }
         
+        var extensions = LoadExtensions();
+        
+        foreach (var extension in extensions)
+        {
+            extension.OnPreLoad();
+        }
+        
+        if (!WorldManager.Worlds.Any())
+        {
+            WorldManager.CreateWorld();
+        }
+        
+        WorldManager.Worlds[0].EnqueueEvent(world =>
+        {
+            foreach (var person in world.People)
+            {
+                Console.WriteLine($"Found person with ID {person.ID}; Balance: {person.Cash:0.00}, Items: {string.Join(", ", person.Items)}, Hair color: #{person.Appearance.HairColorFormatted}, Skin color: #{person.Appearance.SkinColorFormatted}");
+                // foreach (var items in inhabitant.Items)
+                // {
+                //     Console.WriteLine("  " + items);
+                // }
+            }
+        });
+        
         foreach (var extension in extensions)
         {
             extension.OnLoad();
         }
         
-        WorldManager.World.WorldTick += () =>
+        WorldManager.Worlds[0].WorldTick += TestWorldTick;
+        WorldManager.Worlds[0].Start();
+    }
+
+    private static void TestWorldTick(IWorld world)
+    {
+        Console.WriteLine("Tick");
+
+        var people = world.People.ToArray();
+            
+        if (Random.Shared.NextDouble() <= 0.5)
         {
-            Console.WriteLine("Tick");
-
-            var people = WorldManager.People.ToArray();
-            
-            if (Random.Shared.NextDouble() <= 0.5)
-            {
-                Console.WriteLine("Random event occurred");
+            Console.WriteLine("Random event occurred");
                 
-                try
-                {
-                    var randomItem = ItemRegistry.GetRandom();
-                    var randomPerson = people[Random.Shared.Next(people.Length)];
-                    
-                    randomPerson.AddItem(randomItem);
-                    
-                    Console.WriteLine($"Added {randomItem.Name} to person with ID {randomPerson.ID}");
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-
-            if (Random.Shared.NextDouble() < 0.5)
+            try
             {
+                var randomItem = ItemRegistry.GetRandom();
                 var randomPerson = people[Random.Shared.Next(people.Length)];
-                var intent = new SeekingBuyItemIntent(randomPerson, ItemRegistry.GetRandom());
-                randomPerson._intents.Add(intent);
-                Console.WriteLine(intent.Declaration());
+                    
+                randomPerson.AddItem(randomItem);
+                    
+                Console.WriteLine($"Added {randomItem.Name} to person with ID {randomPerson.ID}");
             }
-            
-            if (++Ticks == 3)
+            catch (Exception e)
             {
-                WorldManager.World.Stop();
+                Console.WriteLine(e);
             }
-        };
-        
-        PersonFactory.CreatePeople(WorldManager.World, options.InitialPopulation);
-        WorldManager.World.Run();
-        
-        WorldManager.OnWorldEnd();
+        }
+
+        if (Random.Shared.NextDouble() < 0.5)
+        {
+            var randomPerson = people[Random.Shared.Next(people.Length)];
+            var intent = new SeekingBuyItemIntent(randomPerson, ItemRegistry.GetRandom());
+            randomPerson.MutableIntents.Add(intent);
+            Console.WriteLine(intent.Declaration());
+        }
+            
+        if (++_ticks == 3)
+        {
+            world.Stop();
+        }
     }
 
     private static List<IVilleExtension> LoadExtensions()

@@ -2,21 +2,27 @@
 
 public class World : IWorld
 {
-    public delegate void WorldTickHandler();
-    
-    public event WorldTickHandler? WorldTick;
-    
-    protected readonly EventDispatcher EventDispatcher = new();
+    public event IWorld.WorldTickHandler? WorldTick;
+    public event IWorld.WorldTickHandler? WorldStart;
+    public event IWorld.WorldTickHandler? WorldEnd;
+
+    protected readonly EventDispatcher<IWorld> EventDispatcher;
     protected readonly HashSet<IWorldInhabitant> MutableInhabitants = [];
     
     protected bool Running;
     protected long NextTick;
 
-    public IEnumerable<IWorldInhabitant> Inhabitants => MutableInhabitants.AsEnumerable();
+    public World()
+    {
+        EventDispatcher = new EventDispatcher<IWorld>(this);
+    }
+
+    public IEnumerable<IWorldInhabitant> Inhabitants => MutableInhabitants.AsReadOnly();
     
-    public void Run()
+    public void Start()
     {
         Running = true;
+        WorldStart?.Invoke(this);
         NextTick = DateTimeOffset.Now.ToUnixTimeMilliseconds();
         while (Running)
         {
@@ -28,7 +34,7 @@ public class World : IWorld
             var now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             if (now >= NextTick)
             {
-                OnWorldTick();
+                WorldTick?.Invoke(this);
                 NextTick = now + Random.Shared.NextInt64(50, 750);
             }
         }
@@ -37,9 +43,10 @@ public class World : IWorld
     public void Stop()
     {
         Running = false;
+        WorldEnd?.Invoke(this);
     }
 
-    public void EnqueueEvent(Action @event)
+    public void EnqueueEvent(Action<IWorld> @event)
     {
         EventDispatcher.Enqueue(@event);
     }
@@ -57,10 +64,5 @@ public class World : IWorld
     public bool RemoveInhabitant(IWorldInhabitant inhabitant)
     {
         return MutableInhabitants.Remove(inhabitant);
-    }
-
-    protected virtual void OnWorldTick()
-    {
-        WorldTick?.Invoke();
     }
 }

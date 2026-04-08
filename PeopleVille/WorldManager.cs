@@ -4,27 +4,40 @@ namespace PeopleVille;
 
 public static class WorldManager
 {
-    public delegate World? WorldCreationHandler(WorldCreationOptions options);
+    public delegate void WorldCreationHandler(IWorld world);
     
-    public delegate void WorldEndHandler();
+    public delegate void WorldCreatedHandler(IWorld world);
     
     public static event WorldCreationHandler? WorldCreation;
-    public static event WorldEndHandler? WorldEnd;
+    
+    public static event WorldCreatedHandler? WorldCreated;
 
-    public static World? World { get; internal set; }
+    internal static List<IWorld> MutableWorlds = [];
 
-    public static IEnumerable<Person> People => World?.Inhabitants
-        .Where(x =>
-            x.GetType().IsAssignableFrom(typeof(Person)))
-        .Cast<Person>() ?? [];
+    public static IReadOnlyList<IWorld> Worlds { get; } = MutableWorlds.AsReadOnly();
 
-    internal static World? OnWorldCreation(WorldCreationOptions options)
+    public static IWorld CreateWorld()
     {
-        return WorldCreation?.Invoke(options);
+        return CreateWorld<World>();
     }
 
-    internal static void OnWorldEnd()
+    public static IWorld CreateWorld(WorldCreationOptions options)
     {
-        WorldEnd?.Invoke();
+        return CreateWorld<World>(options);
+    }
+    
+    public static T CreateWorld<T>() where T : IWorld, new()
+    {
+        return CreateWorld<T>(new WorldCreationOptions());
+    }
+
+    public static T CreateWorld<T>(WorldCreationOptions options) where T : IWorld, new()
+    {
+        var world = new T();
+        WorldCreation?.Invoke(world);
+        PersonFactory.CreatePeople(world, options.InitialPopulation);
+        MutableWorlds.Add(world);
+        WorldCreated?.Invoke(world);
+        return world;
     }
 }

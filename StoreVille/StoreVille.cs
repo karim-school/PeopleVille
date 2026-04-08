@@ -1,5 +1,4 @@
 ﻿using PeopleVille;
-using PeopleVille.Engine;
 
 namespace StoreVille;
 
@@ -7,11 +6,8 @@ public sealed class StoreVille : IVilleExtension
 {
     public void OnPreLoad()
     {
-        WorldManager.WorldCreation += (WorldCreationOptions options) =>
-        {
-            Console.WriteLine("StoreVille World creation");
-            return new World();
-        };
+        Console.WriteLine("StoreVille World creation");
+        WorldManager.CreateWorld();
     }
 
     public void OnLoad()
@@ -32,14 +28,14 @@ public sealed class StoreVille : IVilleExtension
             Console.WriteLine(e);
         }
         
-        WorldManager.World!.WorldTick += () =>
+        WorldManager.Worlds[0].WorldTick += world =>
         {
             if (Random.Shared.NextDouble() < 0.5)
             {
                 return;
             }
 
-            var people = WorldManager.People.ToArray();
+            var people = world.People.ToArray();
             var randomPerson = people[Random.Shared.Next(people.Length)];
             var randomStore = StoreRegistry.Stores[Random.Shared.Next(StoreRegistry.Stores.Count)];
             var randomItem = ItemRegistry.GetRandom();
