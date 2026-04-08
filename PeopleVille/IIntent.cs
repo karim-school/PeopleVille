@@ -1,8 +1,10 @@
-﻿namespace PeopleVille;
+﻿using PeopleVille.Engine;
+
+namespace PeopleVille;
 
 public interface IIntent
 {
-    public Person Person { get; }
+    public IWorldInhabitant Inhabitant { get; }
     
     string Declaration();
 }

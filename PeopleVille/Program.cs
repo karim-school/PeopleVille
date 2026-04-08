@@ -1,11 +1,8 @@
-﻿using System.Runtime.Loader;
-using PeopleVille.Engine;
-
-namespace PeopleVille;
+﻿namespace PeopleVille;
 
 internal static class Program
 {
-    private static int _ticks = 0;
+    private static int _ticks;
     
     private static void Main(string[] args)
     {
@@ -18,12 +15,8 @@ internal static class Program
             Console.WriteLine(e);
         }
         
-        var extensions = LoadExtensions();
-        
-        foreach (var extension in extensions)
-        {
-            extension.OnPreLoad();
-        }
+        ExtensionLoader.GetExtensions();
+        ExtensionLoader.PreLoad();
         
         if (!WorldManager.Worlds.Any())
         {
@@ -42,100 +35,15 @@ internal static class Program
             }
         });
         
-        foreach (var extension in extensions)
-        {
-            extension.OnLoad();
-        }
+        ExtensionLoader.Load();
         
-        WorldManager.Worlds[0].WorldTick += TestWorldTick;
+        WorldManager.Worlds[0].WorldTick += DefaultWorldBehavior.AddItem;
+        WorldManager.Worlds[0].WorldTick += DefaultWorldBehavior.SellItem;
+        WorldManager.Worlds[0].WorldTick += DefaultWorldBehavior.BuyItem;
+        WorldManager.Worlds[0].WorldTick += world =>
+        {
+            if (++_ticks >= 3) world.Stop();
+        };
         WorldManager.Worlds[0].Start();
-    }
-
-    private static void TestWorldTick(IWorld world)
-    {
-        Console.WriteLine("Tick");
-
-        var people = world.People.ToArray();
-            
-        if (Random.Shared.NextDouble() <= 0.5)
-        {
-            Console.WriteLine("Random event occurred");
-                
-            try
-            {
-                var randomItem = ItemRegistry.GetRandom();
-                var randomPerson = people[Random.Shared.Next(people.Length)];
-                    
-                randomPerson.AddItem(randomItem);
-                    
-                Console.WriteLine($"Added {randomItem.Name} to person with ID {randomPerson.ID}");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-        }
-
-        if (Random.Shared.NextDouble() < 0.5)
-        {
-            var randomPerson = people[Random.Shared.Next(people.Length)];
-            var intent = new SeekingBuyItemIntent(randomPerson, ItemRegistry.GetRandom());
-            randomPerson.MutableIntents.Add(intent);
-            Console.WriteLine(intent.Declaration());
-        }
-            
-        if (++_ticks == 3)
-        {
-            world.Stop();
-        }
-    }
-
-    private static List<IVilleExtension> LoadExtensions()
-    {
-        var sharedLibraries = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory)
-            .Where(s => s.EndsWith(".dll", StringComparison.InvariantCultureIgnoreCase));
-        var extensions = new List<IVilleExtension>();
-        
-        foreach (var file in sharedLibraries)
-        {
-            try
-            {
-                var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(file);
-                var extensionTypes =
-                    assembly.DefinedTypes.Where(info => info.ImplementedInterfaces.Contains(typeof(IVilleExtension)));
-                
-                foreach (var extensionType in extensionTypes)
-                {
-                    Console.WriteLine($"Found extension {extensionType.Assembly.GetName().Name}");
-                    
-                    try
-                    {
-                        var constructor = extensionType.GetConstructor([]);
-                        
-                        if (constructor == null)
-                        {
-                            Console.WriteLine($"Type {extensionType.FullName} does not have a default constructor");
-                            continue;
-                        }
-                        
-                        var extension = (constructor.Invoke([]) as IVilleExtension)!;
-                        
-                        extensions.Add(extension);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Failed to load extension: " + extensionType.Assembly.GetName().Name);
-                        Console.WriteLine(e);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Failed to load library: " + file);
-                Console.WriteLine(e);
-            }
-        }
-
-        return extensions;
     }
 }
