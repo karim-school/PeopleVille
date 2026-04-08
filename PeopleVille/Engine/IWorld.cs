@@ -1,4 +1,4 @@
-﻿namespace SimulationEngine;
+﻿namespace PeopleVille.Engine;
 
 public interface IWorld
 {

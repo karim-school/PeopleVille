@@ -14,16 +14,6 @@
             "related": ".xml"
           }
         }
-      },
-      "SimulationEngine/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v10.0",
-        "compile": {
-          "bin/placeholder/SimulationEngine.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/SimulationEngine.dll": {}
-        }
       }
     }
   },
@@ -57,17 +47,11 @@
         "newtonsoft.json.nuspec",
         "packageIcon.png"
       ]
-    },
-    "SimulationEngine/1.0.0": {
-      "type": "project",
-      "path": "../SimulationEngine/SimulationEngine.csproj",
-      "msbuildProject": "../SimulationEngine/SimulationEngine.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net10.0": [
-      "Newtonsoft.Json >= 13.0.4",
-      "SimulationEngine >= 1.0.0"
+      "Newtonsoft.Json >= 13.0.4"
     ]
   },
   "packageFolders": {
@@ -94,11 +78,7 @@
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
-          "projectReferences": {
-            "C:\\Users\\Karim\\Documents\\Projects\\PeopleVille\\SimulationEngine\\SimulationEngine.csproj": {
-              "projectPath": "C:\\Users\\Karim\\Documents\\Projects\\PeopleVille\\SimulationEngine\\SimulationEngine.csproj"
-            }
-          }
+          "projectReferences": {}
         }
       },
       "warningProperties": {
