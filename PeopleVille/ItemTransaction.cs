@@ -38,13 +38,45 @@ public static class ItemTransaction
     {
         Console.WriteLine(intent.Declaration());
         
+        var world = intent.Inhabitant.World;
+        var buyIntents = GetBuyIntents(world, intent.Item)
+            .Where(x => x.Inhabitant != intent.Inhabitant)
+            .OrderBy(x => x.Quantity >= intent.Quantity) // can buy all at once
+            .ThenByDescending(x => x.Budget == null) // no budget
+            .ThenByDescending(x => x.Budget);
+        
         var originalQuantity = intent.Quantity;
         
         // TODO
-        
-        if (intent.Quantity == 0)
+        foreach (var buyIntent in buyIntents)
         {
-            return;
+            if ((buyIntent.Inhabitant as Person)?.Cash < intent.PricePerUnit)
+            {
+                continue;
+            }
+            
+            var toSell = intent.Quantity;
+            var sellerItemCount = (intent.Inhabitant as Person)?.Items.GetValueOrDefault(intent.Item, 0u) ?? 0u;
+            var quantity = Math.Min(Math.Min(sellerItemCount, toSell), buyIntent.Quantity);
+
+            if (quantity == 0)
+            {
+                continue;
+            }
+
+            var price = FulfillTransaction(buyIntent, intent, quantity);
+            
+            Console.WriteLine($"{intent.Inhabitant.ID} sold {quantity}x {intent.Item.Name} to {buyIntent.Inhabitant.ID} for {price:0.00}");
+
+            if (buyIntent.Quantity > 0)
+            {
+                Console.WriteLine(buyIntent.Declaration());
+            }
+
+            if (intent.Quantity == 0)
+            {
+                return;
+            }
         }
         
         (intent.Inhabitant as Person)?.MutableIntents.Add(intent);
@@ -83,7 +115,7 @@ public static class ItemTransaction
                 break;
             }
 
-            var sellerItemCount = (sellIntent.Inhabitant as Person)?.Items[sellIntent.Item] ?? 0;
+            var sellerItemCount = (sellIntent.Inhabitant as Person)?.Items.GetValueOrDefault(sellIntent.Item, 0u) ?? 0u;
             var quantity = Math.Min(Math.Min(sellerItemCount, sellIntent.Quantity), toBuy);
 
             if (quantity == 0)
@@ -92,10 +124,14 @@ public static class ItemTransaction
             }
 
             var price = FulfillTransaction(intent, sellIntent, quantity);
-            intent.Quantity -= quantity;
             cashSpent += price;
             
             Console.WriteLine($"{intent.Inhabitant.ID} bought {quantity}x {intent.Item.Name} from {sellIntent.Inhabitant.ID} for {price:0.00}");
+
+            if (sellIntent.Quantity > 0)
+            {
+                Console.WriteLine(sellIntent.Declaration());
+            }
             
             if (intent.Quantity == 0)
             {
@@ -118,11 +154,13 @@ public static class ItemTransaction
         (sellIntent.Inhabitant as Person)?.RemoveItem(buyIntent.Item, quantity);
         (buyIntent.Inhabitant as Person)?.AddItem(buyIntent.Item, quantity);
         (buyIntent.Inhabitant as Person)?.Cash -= price;
+        
+        buyIntent.Quantity -= quantity;
+        sellIntent.Quantity -= quantity;
 
         if (quantity < sellIntent.Quantity)
         {
             sellIntent.Price = sellIntent.PricePerUnit * (sellIntent.Quantity - quantity);
-            sellIntent.Quantity -= quantity;
         }
         else
         {

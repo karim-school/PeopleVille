@@ -40,7 +40,8 @@ public static class DefaultWorldBehavior
     {
         var people = world.People.ToArray();
         var randomPerson = people[Random.Shared.Next(people.Length)];
-        var buyIntent = new BuyItemIntent(randomPerson, ItemRegistry.GetRandom(), (uint)Random.Shared.Next(1, 6));
+        decimal? budget = Random.Shared.Next(2) == 0 ? new decimal(Random.Shared.NextDouble() * 900 + 100) : null;
+        var buyIntent = new BuyItemIntent(randomPerson, ItemRegistry.GetRandom(), (uint)Random.Shared.Next(1, 6), budget);
         ItemTransaction.Signal(buyIntent);
     }
 }
