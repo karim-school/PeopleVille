@@ -8,9 +8,9 @@ public class BuyItemIntent(IWorldInhabitant inhabitant, Item item, uint quantity
 
     public Item Item { get; } = item;
     
-    public uint Quantity { get; } = quantity;
+    public uint Quantity { get; internal set; } = quantity;
     
-    public decimal? Budget { get; } = budget;
+    public decimal? Budget { get; internal set; } = budget;
     
     public string Declaration()
     {
