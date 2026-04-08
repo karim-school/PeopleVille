@@ -27,4 +27,18 @@ public class Person(IWorld world, Guid? id = null) : IWorldInhabitant
         _items[item] = count + quantity;
         return count + quantity;
     }
+
+    public uint RemoveItem(Item item, uint quantity = 1)
+    {
+        if (!_items.TryGetValue(item, out var count))
+        {
+            throw new KeyNotFoundException("Person does not have any of this item");
+        }
+        _items[item] = count - quantity;
+        if (_items[item] == 0)
+        {
+            _items.Remove(item);
+        }
+        return count + quantity;
+    }
 }

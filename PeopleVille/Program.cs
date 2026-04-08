@@ -42,7 +42,7 @@ internal static class Program
         WorldManager.Worlds[0].WorldTick += DefaultWorldBehavior.BuyItem;
         WorldManager.Worlds[0].WorldTick += world =>
         {
-            if (++_ticks >= 3) world.Stop();
+            if (++_ticks >= 10) world.Stop();
         };
         WorldManager.Worlds[0].Start();
     }

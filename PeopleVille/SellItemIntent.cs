@@ -8,9 +8,11 @@ public class SellItemIntent(IWorldInhabitant inhabitant, Item item, decimal pric
 
     public Item Item { get; } = item;
     
-    public decimal Price { get; } = price;
+    public decimal Price { get; internal set; } = price;
     
-    public uint Quantity { get; } = quantity;
+    public uint Quantity { get; internal set; } = quantity;
+    
+    public decimal PricePerUnit => Price / Quantity;
     
     public string Declaration()
     {

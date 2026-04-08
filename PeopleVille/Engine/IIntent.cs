@@ -1,6 +1,4 @@
-﻿using PeopleVille.Engine;
-
-namespace PeopleVille;
+﻿namespace PeopleVille.Engine;
 
 public interface IIntent
 {

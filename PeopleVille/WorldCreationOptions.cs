@@ -2,5 +2,5 @@
 
 public class WorldCreationOptions
 {
-    public int InitialPopulation { get; set; } = 5;
+    public int InitialPopulation { get; set; } = 10;
 }

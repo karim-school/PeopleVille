@@ -13,7 +13,7 @@ public static class PersonFactory
         var itemCount = Random.Shared.Next(Math.Min(ItemRegistry.Items.Count, 4)) + 1;
         foreach (var item in ItemRegistry.GetRandom(itemCount))
         {
-            var itemQuantity = (uint)Random.Shared.Next(10);
+            var itemQuantity = (uint)Random.Shared.Next(10) + 1;
             person.AddItem(item, itemQuantity);
         }
 
