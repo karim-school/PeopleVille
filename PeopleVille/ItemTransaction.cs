@@ -66,7 +66,7 @@ public static class ItemTransaction
 
             var price = FulfillTransaction(buyIntent, intent, quantity);
             
-            Console.WriteLine($"{intent.Inhabitant.ID} sold {quantity}x {intent.Item.Name} to {buyIntent.Inhabitant.ID} for {price:0.00}");
+            Console.WriteLine($"{(intent.Inhabitant as Person)?.FirstName} sold {quantity}x {intent.Item.Name} to {(buyIntent.Inhabitant as Person)?.FirstName} for {price:0.00}");
 
             if (buyIntent.Quantity > 0)
             {
@@ -111,7 +111,7 @@ public static class ItemTransaction
             if (canBuy == 0 || (intent.Budget.HasValue && cashSpent + sellIntent.PricePerUnit * toBuy > intent.Budget))
             {
                 var budget = intent.Budget.HasValue ? intent.Budget.Value - cashSpent : (intent.Inhabitant as Person)?.Cash;
-                Console.WriteLine($"{intent.Inhabitant.ID} wants to buy {toBuy}x from {sellIntent.Inhabitant.ID}, but the price ({sellIntent.PricePerUnit * toBuy}) is out of their budget ({budget}).");
+                Console.WriteLine($"{(intent.Inhabitant as Person)?.FirstName} wants to buy {toBuy}x from {(sellIntent.Inhabitant as Person)?.FirstName}, but the price ({sellIntent.PricePerUnit * toBuy}) is out of their budget ({budget}).");
                 break;
             }
 
@@ -126,7 +126,7 @@ public static class ItemTransaction
             var price = FulfillTransaction(intent, sellIntent, quantity);
             cashSpent += price;
             
-            Console.WriteLine($"{intent.Inhabitant.ID} bought {quantity}x {intent.Item.Name} from {sellIntent.Inhabitant.ID} for {price:0.00}");
+            Console.WriteLine($"{(intent.Inhabitant as Person)?.FirstName} bought {quantity}x {intent.Item.Name} from {(sellIntent.Inhabitant as Person)?.FirstName} for {price:0.00}");
 
             if (sellIntent.Quantity > 0)
             {

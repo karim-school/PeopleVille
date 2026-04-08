@@ -3,11 +3,15 @@ using PeopleVille.Engine;
 
 namespace PeopleVille;
 
-public class Person(IWorld world, Guid? id = null) : IWorldInhabitant
+public class Person(IWorld world, string firstName, string lastName, Guid? id = null) : IWorldInhabitant
 {
     public IWorld World { get; } = world;
     
     public Guid ID { get; } = id ?? Guid.NewGuid();
+    
+    public string FirstName { get; } = firstName;
+    
+    public string LastName { get; } = lastName;
 
     public HumanAppearance Appearance { get; } = new();
     

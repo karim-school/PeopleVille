@@ -2,8 +2,6 @@
 
 internal static class Program
 {
-    private static int _ticks;
-    
     private static void Main(string[] args)
     {
         try
@@ -27,11 +25,11 @@ internal static class Program
         {
             foreach (var person in world.People)
             {
-                Console.WriteLine($"Found person with ID {person.ID}; Balance: {person.Cash:0.00}, Items: {string.Join(", ", person.Items)}, Hair color: #{person.Appearance.HairColorFormatted}, Skin color: #{person.Appearance.SkinColorFormatted}");
-                // foreach (var items in inhabitant.Items)
-                // {
-                //     Console.WriteLine("  " + items);
-                // }
+                Console.WriteLine($"{person.FirstName} {person.LastName} with ID {person.ID};" +
+                                  $" Balance: {person.Cash:0.00}," +
+                                  $" Items: {string.Join(", ", person.Items)}," +
+                                  $" Hair color: #{person.Appearance.HairColorFormatted}," +
+                                  $" Skin color: #{person.Appearance.SkinColorFormatted}");
             }
         });
         
@@ -40,10 +38,16 @@ internal static class Program
         WorldManager.Worlds[0].WorldTick += DefaultWorldBehavior.AddItem;
         WorldManager.Worlds[0].WorldTick += DefaultWorldBehavior.SellItem;
         WorldManager.Worlds[0].WorldTick += DefaultWorldBehavior.BuyItem;
+        
+        var ticks = 0;
         WorldManager.Worlds[0].WorldTick += world =>
         {
-            if (++_ticks >= 10) world.Stop();
+            if (++ticks > 100)
+            {
+                world.Stop();
+            }
         };
+        
         WorldManager.Worlds[0].Start();
     }
 }

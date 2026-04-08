@@ -6,7 +6,7 @@ public static class PersonFactory
 {
     public static Person CreatePerson(IWorld world, Guid? id = null)
     {
-        var person = new Person(world, id);
+        var person = new Person(world, GenerateFirstName(), GenerateLastName(), id);
         world.AddInhabitant(person);
         person.Cash = new decimal(Random.Shared.NextDouble() * 10000);
         
@@ -31,4 +31,60 @@ public static class PersonFactory
         
         return people;
     }
+    
+    private static string GenerateFirstName()
+    {
+        return FirstNames[Random.Shared.Next(FirstNames.Length)];
+    }
+    
+    private static string GenerateLastName()
+    {
+        return LastNames[Random.Shared.Next(LastNames.Length)];
+    }
+    
+    private static readonly string[] FirstNames = [
+        "Marcellus",
+        "Marley",
+        "Herman",
+        "Grant",
+        "Tatyanna",
+        "Jaleel",
+        "Seamus",
+        "Vicente",
+        "Alessandra",
+        "Ethen",
+        "Jerome",
+        "Caelan",
+        "Dontae",
+        "Kent",
+        "Cruz",
+        "Travis",
+        "Reece",
+        "Freddie",
+        "Loren",
+        "Emilee"
+    ];
+    
+    private static readonly string[] LastNames = [
+        "Lance",
+        "Khan",
+        "Asbury",
+        "Delatorre",
+        "Hurt",
+        "Schindler",
+        "Barnard",
+        "Garrett",
+        "Ly",
+        "Colley",
+        "Salerno",
+        "Guidry",
+        "Raymond",
+        "Garnett",
+        "Baldwin",
+        "Pierson",
+        "Olsen",
+        "Glasgow",
+        "Hoskins",
+        "Brill"
+    ];
 }
